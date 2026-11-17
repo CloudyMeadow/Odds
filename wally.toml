@@ -1,0 +1,11 @@
+[package]
+name = "cloudymeadow/odds"
+description = "Strictly typed loot tables, rarity rolls and pity systems for Roblox, with odds you can trust"
+version = "0.1.0"
+license = "MIT"
+authors = ["CloudyMeadow"]
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+include = ["src", "src/**", "default.project.json", "wally.toml", "LICENSE", "README.md"]
+
+[dependencies]

@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      LUNE_VERSION: 0.10.4
+      STYLUA_VERSION: 2.1.0
+      SELENE_VERSION: 0.28.0
+      LUAU_VERSION: "0.700"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          mkdir -p "$HOME/bin" && cd "$HOME/bin"
+          curl -fsSL -o lune.zip "https://github.com/lune-org/lune/releases/download/v${LUNE_VERSION}/lune-${LUNE_VERSION}-linux-x86_64.zip"
+          curl -fsSL -o stylua.zip "https://github.com/JohnnyMorganz/StyLua/releases/download/v${STYLUA_VERSION}/stylua-linux-x86_64.zip"
+          curl -fsSL -o selene.zip "https://github.com/Kampfkarren/selene/releases/download/${SELENE_VERSION}/selene-${SELENE_VERSION}-linux.zip"
+          curl -fsSL -o luau.zip "https://github.com/luau-lang/luau/releases/download/${LUAU_VERSION}/luau-ubuntu.zip"
+          for f in *.zip; do unzip -o -q "$f"; done
+          chmod +x lune stylua selene luau-analyze
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Format (StyLua)
+        run: stylua --check src tests bench
+
+      - name: Lint (selene)
+        run: selene src tests bench
+
+      - name: Type check (current solver)
+        run: luau-analyze src/*.luau tests/*.spec.luau tests/lib/*.luau bench/*.luau
+
+      - name: Type check (new solver)
+        run: luau-analyze --fflags=LuauSolverV2=true src/*.luau tests/*.spec.luau tests/lib/*.luau bench/*.luau
+
+      - name: Tests
+        run: lune run tests/run
+
+      - name: Benchmark
+        run: lune run bench/roll

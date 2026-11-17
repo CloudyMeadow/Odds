@@ -1,0 +1,17 @@
+# Wally
+Packages/
+DevPackages/
+ServerPackages/
+wally.lock
+
+# Rojo builds and Studio files
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+!examples/*.rbxl
+sourcemap.json
+
+# Tooling
+roblox.yml
+.DS_Store
